@@ -83,7 +83,7 @@ class MetaManager():
 
 class DataManager():
 
-    def __init__(self, hdf_file_name, 
+    def __init__(self, hdf_file_name,
                  data_entry_location='/entry1/tomo_entry/data/data'):
         self._file_handle = h5py.File(hdf_file_name, 'r')
         self._data_entry_location = data_entry_location
@@ -123,9 +123,7 @@ def extract_flat_corrected_projections(hdf_file_name, start_projection, end_proj
     meta = MetaManager(hdf_file_name)
     data = DataManager(hdf_file_name)
     positions = meta.get_projection_positions()[start_projection:end_projection]
-    print "positions", positions
     groups = meta.get_grouped_projection_positions(positions)
-    print "groups", groups
     frames = []
     for group in groups:
         # get dark and flat data
@@ -149,9 +147,7 @@ def extract_flat_corrected_sinograms(hdf_file_name, start_sinogram, end_sinogram
     meta = MetaManager(hdf_file_name)
     data = DataManager(hdf_file_name)
     positions = meta.get_projection_positions()
-    print "positions", positions
     groups = meta.get_grouped_projection_positions(positions)
-    print "groups", groups
     frames = []
     for group in groups:
         # get dark and flat data
