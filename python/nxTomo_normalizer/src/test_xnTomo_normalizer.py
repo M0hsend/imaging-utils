@@ -1,6 +1,4 @@
-import pytest
 import nxTomo_normalizer as nxt
-import os
 
 FILE_LOCATION = './test_data/repacked.nxs'
 

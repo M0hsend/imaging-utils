@@ -26,13 +26,18 @@ import h5py
 class MetaManager():
 
     def __init__(self, hdf_file_name,
-            key_entry_location='/entry1/tomo_entry/instrument/detector/image_key'):
+            key_entry_location='/entry1/tomo_entry/instrument/detector/image_key',
+            position_entry_location='/entry1/tomo_entry/data/rotation_angle'):
         self._file_handle = h5py.File(hdf_file_name, 'r')
         self._key_entry_location = key_entry_location
+        self._position_entry_location = position_entry_location
         self.build_lists()
 
     def get_keys(self):
         return self._file_handle[self._key_entry_location][:]
+
+    def get_angles(self):
+        return self._file_handle[self._position_entry_location][:]
 
     def group_sequential(self, key_data):
         result = []
@@ -43,10 +48,11 @@ class MetaManager():
     def build_lists(self, dark_tag=2, flat_tag=1, projection_tag=0):
         keys = self.get_keys()
         p = np.arange(keys.shape[0])
+        angles = self.get_angles()
         self._dark_positions = self.group_sequential(p[keys == dark_tag])
         self._flat_positions = self.group_sequential(p[keys == flat_tag])
-        self._projection_positions = \
-            self.group_sequential(p[keys == projection_tag])
+        self._projection_positions = self.group_sequential(p[keys == projection_tag])
+        self._projection_angles = angles[keys == projection_tag]
 
     def get_bounding_groups(self, group, bounding_group_list):
         if len(bounding_group_list) <= 1:
@@ -79,6 +85,12 @@ class MetaManager():
 
     def get_grouped_projection_positions(self, positions):
         return self.get_grouped_positions(positions, self._projection_positions)
+
+    def get_angle_ordered_positions(self, start_angle, end_angle):
+        required_angles = (self._projection_angles > start_angle) & (self._projection_angles < end_angle)
+        a = self._projection_angles[required_angles]
+        b = self.get_projection_positions()[required_angles]
+        return [x for (y, x) in sorted(zip(a, b))]
 
 
 class DataManager():
@@ -119,11 +131,10 @@ def extract_darks(hdf_file_name, start_dark, end_dark):
     return data.get_frames(meta.get_dark_positions()[start_dark:end_dark])
 
 
-def extract_flat_corrected_projections(hdf_file_name, start_projection, end_projection):
+def extract_flat_corrected_projections(hdf_file_name, projections):
     meta = MetaManager(hdf_file_name)
     data = DataManager(hdf_file_name)
-    positions = meta.get_projection_positions()[start_projection:end_projection]
-    groups = meta.get_grouped_projection_positions(positions)
+    groups = meta.get_grouped_projection_positions(projections)
     frames = []
     for group in groups:
         # get dark and flat data
@@ -141,6 +152,18 @@ def extract_flat_corrected_projections(hdf_file_name, start_projection, end_proj
             corrected = ((group_data[i:i + 1, :, :] - dark) / (flat - dark))
             frames.append(corrected)
     return np.vstack(frames)
+
+
+def extract_flat_corrected_projections_from_frames(hdf_file_name, start_frame, end_frame):
+    meta = MetaManager(hdf_file_name)
+    positions = meta.get_projection_positions()[start_frame:end_frame]
+    return extract_flat_corrected_projections(hdf_file_name, positions)
+
+
+def extract_flat_corrected_projections_from_angles(hdf_file_name, start_angle, end_angle):
+    meta = MetaManager(hdf_file_name)
+    positions = meta.get_angle_ordered_positions(start_angle, end_angle)
+    return extract_flat_corrected_projections(hdf_file_name, positions)
 
 
 def extract_flat_corrected_sinograms(hdf_file_name, start_sinogram, end_sinogram):

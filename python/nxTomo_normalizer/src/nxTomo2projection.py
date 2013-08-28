@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 '''
  Copyright 2013 Diamond Light Source Ltd.
 
@@ -19,20 +20,24 @@
 import os
 import optparse
 import Image
+import json
 
 import numpy as np
 
 from nxTomo_normalizer import extract_flat_corrected_projections
 
 if __name__ == "__main__":
-    usage = "%prog [options] input_nexus output_directory"
+    usage = "%prog [options]"
     parser = optparse.OptionParser(usage=usage, version="%prog 1.0")
-    parser.add_option("-b", "--begin", dest="begin", help="projection to begin from", default=0, type='int')
-    parser.add_option("-s", "--slices", dest="slices", help="number of projections to process", default=-1, type='int')
-    parser.add_option("-f", "--format", dest="format", help="format for the output files", default="p_%05d.tif")
-    parser.add_option("-n", "--number_of_slices_per_read", dest="num_slices", help="The number of slices which will be read into memory at a time", default=16, type='int')
+    parser.add_option("-i", "--input", dest="input", help="input json file")
+    parser.add_option("-o", "--output", dest="output", help="output json file")
+    parser.add_option("-d", "--data", dest="data", help="input hdf5 file")
+    parser.add_option("-r", "--result", dest="result", help="output hdf5 file")
+    parser.add_option("-l", "--log", dest="log", help="log file")
 
     (options, args) = parser.parse_args()
+
+    parameters = json.load(open(options.input))
 
     for i in range(options.begin, options.begin + options.slices, options.num_slices):
         print i
