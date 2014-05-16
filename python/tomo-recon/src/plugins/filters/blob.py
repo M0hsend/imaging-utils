@@ -13,10 +13,10 @@ def ready_to_process(que):
     return False
 
 def frame_padding():
-    return (1, "Reflect")
+    return 1
 
 def metadata_required():
-    return ("Flats", "Angle") # anything from nxTomo.
+    return ("Flats", "Darks", "Angle") # anything from nxTomo.
 
 def process(data, meta):
     #set up input file
@@ -24,7 +24,6 @@ def process(data, meta):
     settings['CPU'] = 1
     # run process
     
-    np.removeblobs()
     result = cython_blob.run(data, settings)
 
 

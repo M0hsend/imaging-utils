@@ -1,7 +1,7 @@
-import cython_blob
+import cython_zinger
 
 def resources():
-    return ("CPU", 1) # max option
+    return ("CPU", 4) # max option
 
 # What if there are only 9 left.
 def batch_size():
@@ -13,19 +13,15 @@ def ready_to_process(que):
     return False
 
 def frame_padding():
-    return (1, "Reflect")
+    return 1
 
-def metadata_required():
-    return ("Flats", "Angle") # anything from nxTomo.
-
-def process(data, meta):
+def process(data):
     #set up input file
     settings = {}
-    settings['CPU'] = 1
+    settings['CPU'] = 4
     # run process
     
-    np.removeblobs()
-    result = cython_blob.run(data, settings)
+    result = cython_zinger.run(data, settings)
 
 
     return result
