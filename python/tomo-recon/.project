@@ -14,4 +14,16 @@
 	<natures>
 		<nature>org.python.pydev.pythonNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>marktest</name>
+			<type>2</type>
+			<location>/dls/i13/data/2014/mt9396-1/processing/marktest</location>
+		</link>
+		<link>
+			<name>tomopy</name>
+			<type>2</type>
+			<location>/dls_sw/apps/tomopy</location>
+		</link>
+	</linkedResources>
 </projectDescription>
