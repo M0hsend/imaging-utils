@@ -1,8 +1,8 @@
 def preprocess():
-    print "preproceesing filter test"
+    return "preproceesing filter test"
 
 def process():
-    print "processing filter test"
+    return "processing filter test"
 
 def postprocess():
-    print "postprocessing filter test"
+    return "postprocessing filter test"

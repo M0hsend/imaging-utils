@@ -16,3 +16,4 @@ def load_loader_plugin(name):
 
 def load_filter_plugin(name):
     return load_plugin('plugins.filters.%s' % name)
+

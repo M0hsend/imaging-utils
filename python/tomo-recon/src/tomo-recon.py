@@ -22,6 +22,8 @@
 #require('pyzmq==13.1.0')
 import zmq
 
+from plugins import utils as pu
+
 import threading
 from Queue import Queue
 from mpi4py import MPI
@@ -46,6 +48,7 @@ import random
 
 #q2lock = threading.Lock()
 
+loader = pu.load_loader_plugin('test')
 
 MPI.COMM_WORLD.barrier()
 
@@ -62,6 +65,7 @@ if machine_rank == 0:
     for i in range(2):
         data = np.random.rand(1000,1000,1)
         logging.debug("Sending data with mean %f and shape %s" %(data.mean(), str(data.shape)))
+        logging.debug(loader.process())
         MPI.COMM_WORLD.Send(data, dest=((machines*1) + machine_number), tag=1)
         logging.debug("Sent data with mean %f and shape %s" %(data.mean(), str(data.shape)))
 if machine_rank == 1:

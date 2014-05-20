@@ -3,6 +3,7 @@ def preprocess():
 
 def process():
     print "processing"
+    return "processing"
 
 def postprocess():
     print "postprocessing"
