@@ -25,6 +25,6 @@ def load_tests(filter_names):
         test_cases.addTest(GeneralTestCase('runTest', filter_name))
     return test_cases
 
-def run_test(filter_name):
-    suite = load_tests([filter_name])
+def run_tests(filter_name_list):
+    suite = load_tests(filter_name_list)
     unittest.TextTestRunner(verbosity=2).run(suite)
