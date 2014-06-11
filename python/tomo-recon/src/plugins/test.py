@@ -5,6 +5,13 @@ Created on 20 May 2014
 '''
 import unittest
 import utils
+import inspect
+import os
+
+import numpy as np
+
+from data import NXTomo
+import logging
 
 class GeneralTestCase(unittest.TestCase):
     def __init__(self, methodName, param1):
@@ -13,10 +20,18 @@ class GeneralTestCase(unittest.TestCase):
         self.param1 = param1
 
     def runTest(self):
+        num_sections = 2
         filt = utils.load_filter_plugin(self.param1)
-        self.assertEqual("preproceesing filter test", filt.preprocess())
-        self.assertEqual("processing filter test", filt.process())
-        self.assertEqual("postprocessing filter test", filt.postprocess())
+        data = NXTomo.NXtomo(get_test_data_path())
+        filt.setup(data)
+        section_length = (len(data.projection_frames) / num_sections)
+        if (section_length * num_sections) < len(data.projection_frames):
+            section_length += 1
+        pro_frames = np.array(data.projection_frames)
+        for i in range(num_sections):
+            filt.process(data, pro_frames[:section_length])
+            pro_frames = pro_frames[section_length:]
+        filt.teardown(data)
 
 
 def load_tests(filter_names):
@@ -24,6 +39,12 @@ def load_tests(filter_names):
     for filter_name in filter_names:
         test_cases.addTest(GeneralTestCase('runTest', filter_name))
     return test_cases
+
+
+def get_test_data_path():
+    path = inspect.stack()[0][1]
+    return '/'.join(os.path.split(path)[0].split(os.sep)[:-2] + ['test_data', '24737.nxs'])
+
 
 def run_tests(filter_name_list):
     suite = load_tests(filter_name_list)

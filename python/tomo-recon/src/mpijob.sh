@@ -11,10 +11,10 @@ echo "number of uniq hosts: ${uniqslots}"
 echo "running on these hosts:"
 cat ${UNIQHOSTS}
 
-processes=`bc <<< "$uniqslots*4"`
+processes=`bc <<< "$uniqslots*2"`
 
 echo "Processes running are : ${processes}"
 
 mpirun -np ${processes} \
        --hostfile ${UNIQHOSTS} \
-       python ${wdir}/tomo-recon.py
+       python ${wdir}/tomo-recon.py $@
