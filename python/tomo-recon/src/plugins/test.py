@@ -13,6 +13,7 @@ import numpy as np
 from data import NXTomo
 import logging
 
+
 class GeneralTestCase(unittest.TestCase):
     def __init__(self, methodName, param1):
         super(GeneralTestCase, self).__init__(methodName)
@@ -20,17 +21,27 @@ class GeneralTestCase(unittest.TestCase):
         self.param1 = param1
 
     def runTest(self):
-        num_sections = 2
-        filt = utils.load_filter_plugin(self.param1)
         data = NXTomo.NXtomo(get_test_data_path())
+
+        filt = utils.load_filter_plugin(self.param1)
         filt.setup(data)
+
+        num_sections = 5
         section_length = (len(data.projection_frames) / num_sections)
         if (section_length * num_sections) < len(data.projection_frames):
             section_length += 1
-        pro_frames = np.array(data.projection_frames)
+        pro_frames = np.arange(data.projection_frames.shape[0])
+        frame_batch = []
+
         for i in range(num_sections):
-            filt.process(data, pro_frames[:section_length])
+            framelist = pro_frames[:section_length]
+            frame_batch.append(filt.requires(framelist))
             pro_frames = pro_frames[section_length:]
+
+        for framelist in frame_batch:
+            frames = data.get_projections(framelist)
+            filt.process(data, frames)
+
         filt.teardown(data)
 
 

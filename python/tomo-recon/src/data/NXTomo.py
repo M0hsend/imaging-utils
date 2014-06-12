@@ -4,6 +4,7 @@ Created on 2 Jun 2014
 @author: ssg37927
 '''
 
+import logging
 import numpy as np
 import h5py
 
@@ -41,5 +42,5 @@ class NXtomo(object):
         raise KeyError('NXTomo entry not found in this file')
 
     def get_projections(self, projection_list):
-        frame_list = self.__projection_frames[projection_list]
-        return self.nxtomo['instrument/detector/data'][frame_list]
+        frame_list = self.projection_frames[projection_list]
+        return self.nxtomo['instrument/detector/data'][frame_list, :, :]
