@@ -8,4 +8,4 @@ logging.basicConfig(level=logging.DEBUG)
 
 import plugins.test as pt
 
-pt.run_tests(["FilterTest", "FilterTestPlot"])
+pt.run_tests(["FilterTest", "FilterTestPlot", "Median3x3Filter"])
