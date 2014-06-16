@@ -12,6 +12,7 @@ import numpy as np
 
 from data import NXTomo
 import logging
+import tempfile
 
 
 class LoaderTestCase(unittest.TestCase):
@@ -73,14 +74,44 @@ class FilterTestCase(unittest.TestCase):
         filt.teardown(data)
 
 
+class SaverTestCase(unittest.TestCase):
+    def __init__(self, methodName, param1):
+        super(SaverTestCase, self).__init__(methodName)
+
+        self.param1 = param1
+
+    def runTest(self):
+        data = NXTomo.NXtomo(get_test_data_path())
+
+        saver = utils.load_saver_plugin(self.param1)
+        tempfilename = tempfile.mktemp('.nxs')
+        logging.debug('Temporary file being written : %s' % tempfilename)
+        saver.setup(tempfilename, data)
+
+        frame_batch = saver.requires(data)
+
+        for framelist in frame_batch:
+            frames = data.get_projections(framelist)
+            saver.save(data, frames, framelist)
+
+        saver.teardown(data)
+
+
 def add_filter_tests(test_suite, filter_names):
     for name in filter_names:
         test_suite.addTest(FilterTestCase('runTest', name))
     return
 
+
 def add_loader_tests(test_suite, loader_names):
     for name in loader_names:
         test_suite.addTest(LoaderTestCase('runTest', name))
+    return
+
+
+def add_saver_tests(test_suite, saver_names):
+    for name in saver_names:
+        test_suite.addTest(SaverTestCase('runTest', name))
     return
 
 
@@ -89,8 +120,9 @@ def get_test_data_path():
     return '/'.join(os.path.split(path)[0].split(os.sep)[:-2] + ['test_data', '24737.nxs'])
 
 
-def run_tests(filter_name_list = [], loader_name_list=[]):
+def run_tests(loader_name_list=[], filter_name_list=[], saver_name_list=[]):
     suite = unittest.TestSuite()
-    add_filter_tests(suite, filter_name_list)
     add_loader_tests(suite, loader_name_list)
+    add_filter_tests(suite, filter_name_list)
+    add_saver_tests(suite, saver_name_list)
     unittest.TextTestRunner(verbosity=2).run(suite)

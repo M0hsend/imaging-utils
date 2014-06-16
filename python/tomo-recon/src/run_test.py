@@ -8,8 +8,15 @@ logging.basicConfig(level=logging.DEBUG)
 
 import plugins.test as pt
 
-pt.run_tests(filter_name_list=["FilterTest",
+pt.run_tests(loader_name_list=[
+                               "LoaderTest",
+                               #"LoaderTestPlot",
+                               ],
+             filter_name_list=[
+                               "FilterTest",
                                #"FilterTestPlot",
-                               "Median3x3Filter"],
-             loader_name_list=["LoaderTest",
-                               "LoaderTestPlot"])
+                               "Median3x3Filter",
+                               ],
+             saver_name_list=[
+                              "SaverTest",
+                              ])

@@ -49,3 +49,8 @@ class NXtomo(TomoMetadata):
 
     def get_number_of_frames(self):
         return self.projection_frames.shape[0]
+
+    def get_data_shape(self):
+        x, y, z = self.darks.shape
+        x = self.projection_frames.shape[0]
+        return (x, y, z)

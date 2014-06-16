@@ -27,3 +27,7 @@ class TomoMetadata(object):
     def get_number_of_frames(self):
         logging.error("get_number_of_frames needs to be implemented")
         raise NotImplementedError("get_number_of_frames needs to be implemented")
+
+    def get_data_shape(self):
+        logging.error("get_data_shape needs to be implemented")
+        raise NotImplementedError("get_data_shape needs to be implemented")

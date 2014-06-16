@@ -14,9 +14,14 @@ def load_plugin(name):
     instance = class_()
     return instance
 
+
 def load_loader_plugin(name):
     return load_plugin('plugins.loaders.%s' % name)
+
 
 def load_filter_plugin(name):
     return load_plugin('plugins.filters.%s' % name)
 
+
+def load_saver_plugin(name):
+    return load_plugin('plugins.savers.%s' % name)
