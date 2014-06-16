@@ -14,9 +14,37 @@ from data import NXTomo
 import logging
 
 
-class GeneralTestCase(unittest.TestCase):
+class LoaderTestCase(unittest.TestCase):
     def __init__(self, methodName, param1):
-        super(GeneralTestCase, self).__init__(methodName)
+        super(LoaderTestCase, self).__init__(methodName)
+
+        self.param1 = param1
+
+    def runTest(self):
+        data_filename = get_test_data_path()
+
+        loader = utils.load_loader_plugin(self.param1)
+        loader.setup(data_filename)
+
+        meta = loader.load_metadata()
+
+        num_sections = 5
+        section_length = (meta.get_number_of_frames() / num_sections)
+        if (section_length * num_sections) < meta.get_number_of_frames():
+            section_length += 1
+        pro_frames = np.arange(meta.get_number_of_frames())
+
+        for i in range(num_sections):
+            framelist = pro_frames[:section_length]
+            loader.load_frames(framelist)
+            pro_frames = pro_frames[section_length:]
+
+        loader.teardown()
+
+
+class FilterTestCase(unittest.TestCase):
+    def __init__(self, methodName, param1):
+        super(FilterTestCase, self).__init__(methodName)
 
         self.param1 = param1
 
@@ -45,11 +73,15 @@ class GeneralTestCase(unittest.TestCase):
         filt.teardown(data)
 
 
-def load_tests(filter_names):
-    test_cases = unittest.TestSuite()
-    for filter_name in filter_names:
-        test_cases.addTest(GeneralTestCase('runTest', filter_name))
-    return test_cases
+def add_filter_tests(test_suite, filter_names):
+    for name in filter_names:
+        test_suite.addTest(FilterTestCase('runTest', name))
+    return
+
+def add_loader_tests(test_suite, loader_names):
+    for name in loader_names:
+        test_suite.addTest(LoaderTestCase('runTest', name))
+    return
 
 
 def get_test_data_path():
@@ -57,6 +89,8 @@ def get_test_data_path():
     return '/'.join(os.path.split(path)[0].split(os.sep)[:-2] + ['test_data', '24737.nxs'])
 
 
-def run_tests(filter_name_list):
-    suite = load_tests(filter_name_list)
+def run_tests(filter_name_list = [], loader_name_list=[]):
+    suite = unittest.TestSuite()
+    add_filter_tests(suite, filter_name_list)
+    add_loader_tests(suite, loader_name_list)
     unittest.TextTestRunner(verbosity=2).run(suite)

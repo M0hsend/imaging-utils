@@ -8,8 +8,10 @@ import logging
 import numpy as np
 import h5py
 
+from Metadata import TomoMetadata
 
-class NXtomo(object):
+
+class NXtomo(TomoMetadata):
     '''
     classdocs
     '''
@@ -44,3 +46,6 @@ class NXtomo(object):
     def get_projections(self, projection_list):
         frame_list = self.projection_frames[projection_list]
         return self.nxtomo['instrument/detector/data'][frame_list, :, :]
+
+    def get_number_of_frames(self):
+        return self.projection_frames.shape[0]
