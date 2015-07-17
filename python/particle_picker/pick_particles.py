@@ -133,17 +133,17 @@ def load_hdf5_data(path, dataset, show=0):
         try:
             data = np.squeeze(read_rec(path)[1])
         except:
-            print("Error: dataset '%s' not found" % args.dataset)
+            print("Error loading file '%s'" % path)
             sys.exit(1)
     else:
         with h5.File(path, 'r') as f:
             try:
                 data = np.squeeze(f[dataset][:])
             except:
-                print("Error: dataset '%s' not found" % args.dataset)
+                print("Error: dataset '%s' not found" % dataset)
                 sys.exit(1)
 
-    if show > 1:
+    if show > 2:
         fig, ax = plt.subplots(figsize=(10, 10))
         ax.imshow(data, 'optiona')
         plt.title('Image')
@@ -170,7 +170,7 @@ def preprocess_data(data, newsize, show=0):
     resized -= data.min()
     resized /= data.max()
 
-    if show > 2:
+    if show > 3:
         fig, ax = plt.subplots(figsize=(10, 10))
         ax.imshow(resized, 'optiona')
         plt.title('Resized Image')
@@ -209,7 +209,7 @@ def denoise(data, weight, method=1, eps=1e-4, max_iter=100, show=0):
         denoised = denoise_tv_bregman(data, weight, eps=eps, max_iter=max_iter,
                                       isotropic=False)
 
-    if method != 0 and show > 2:
+    if method != 0 and show > 3:
         fig, ax = plt.subplots(figsize=(10, 10))
         ax.imshow(denoised, 'optiona')
         plt.title('Denoised')
@@ -239,7 +239,7 @@ def substract_background(data, radius, background='mean', show=0):
 
     rdata = (lforeground - lbackground)
 
-    if show > 1:
+    if show > 2:
         fig, axes = plt.subplots(ncols=3, nrows=1, figsize=(30, 10))
         for ax, im, title in zip(axes, [lforeground, lbackground, rdata],
                                  ['Foreground', 'Background', 'Substraction']):
@@ -272,7 +272,7 @@ def detect_blobs(data, radius, show=0):
 
     blob_image = segments[labels]
 
-    if show > 1:
+    if show > 2:
         fig, axes = plt.subplots(ncols=3, nrows=1, figsize=(30, 10))
         for ax, img in zip(axes, [result, data, blob_image]):
             ax.imshow(img, 'optiona')
@@ -292,7 +292,7 @@ def detect_particles(data, radius, return_coords=True, show=0):
     filled = binary_fill_holes(data)
     eroded = erosion(filled, disk(radius//2))
 
-    if show > 2:
+    if show > 3:
         fig, ax = plt.subplots(figsize=(10, 10))
         ax.imshow(eroded)
         ax.set_title('Eroded')
