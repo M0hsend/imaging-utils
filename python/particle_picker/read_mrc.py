@@ -130,9 +130,9 @@ def read_rec(filename, flip_z=False):
     hdr_str = fd.read(rec_header_dtype.itemsize)
     header = np.ndarray(shape=(), dtype=rec_header_dtype, buffer=hdr_str)
 
-    # Seek header
+    # Seek extended header
     if header['next'] > 0:
-        fd.seek(header['next'])  # ignore extended header
+        fd.seek(rec_header_dtype.itemsize + header['next'])  # ignore extended header
 
     mode = header['mode']
     bo = "<" if header['stamp'][0] == 68 and header['stamp'][1] == 65 else "<" # BitOrder: little or big endian
@@ -144,14 +144,12 @@ def read_rec(filename, flip_z=False):
     # data dimensions
     nx, ny, nz = header['nx'], header['ny'], header['nz']
     img_size = nx * ny * nz * dsize
-    if mode == 6:
-        fd.read(1024)
     img_str = fd.read(img_size)
     dtype = bo + dtype
 
     # Make sure that we have readed the whole file
     assert not fd.read()
-    #assert stats.st_size == header.itemsize + img_size
+    assert stats.st_size == header.itemsize + img_size
 
     fd.close()
 
