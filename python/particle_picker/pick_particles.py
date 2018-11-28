@@ -191,6 +191,7 @@ def get_radius(data, radius, old_shape, new_shape):
             sys.exit(1)
         distance = InteractiveWindow().draw_line(data)
         radius = distance//2
+        print("Radius used is %i" % (radius * np.max(old_shape / new_shape)))
     else:
         radius /= np.max(old_shape / new_shape)
 
