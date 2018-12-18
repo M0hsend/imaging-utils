@@ -8,6 +8,7 @@ def check_differences(beamline, year, visit):
     mib_files = []
 
     raw_location = os.path.join('/dls',beamline,'data', year, visit, 'Merlin')
+    proc_location = os.path.join('/dls',beamline,'data', year, visit, 'processing', 'Merlin')
 
     #look through all the files in that location and find any mib files
     os.chdir(raw_location)
@@ -29,6 +30,10 @@ def check_differences(beamline, year, visit):
     print(to_convert)
 
 
+def main(beamline):
+    check_differences(beamline, year, visit)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('beamline', help='Beamline name')
@@ -38,4 +43,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     
-    main()
+    main(args.beamline)
