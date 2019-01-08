@@ -1,6 +1,3 @@
-#%matplotlib qt5 
-#This won't work with cluster
-
 import hyperspy.api as hs
 import numpy as np
 from math import floor
@@ -12,31 +9,6 @@ import time
 import sys
 from scipy.signal import find_peaks
 
-def folders_setup():
-    """
-    to define the acquisition folder - where time-stamped 4DSTEM data is being saved-
-    and the processing folder - where the reshaped and reconstructed images are to be
-    saved.
-    Input: None - User-input inside the function
-    Output:
-        acquisition_folder: str path
-        processing_folder: str path
-    """
-    
-    acquisition_folder = input('Enter the Medipix acquisition folder path (use time-stamping): ')
-    
-    assert os.path.exists(acquisition_folder), 'We did not find the folder at, '+str(acquisition_folder)
-    
-    acquisition_path = Path(acquisition_folder)
-    processing_folder = []
-    for parts in acquisition_path.parts:
-        if parts.startswith(('em','cm','sp','nt','nr','mg')):
-            print('Found the session folder: ', parts)
-            processing_folder = str(acquisition_path.parents[len(acquisition_path.parts) - 
-                                                             acquisition_path.parts.index(str(parts)) -2]) + r'\processing'
-            os.chdir(processing_folder)
-            print('Processed data will be saved at: ', processing_folder)
-    return [acquisition_folder, processing_folder]
 
 def reshape_4DSTEM_FrameSize(data, scan_x, scan_y):
     """
