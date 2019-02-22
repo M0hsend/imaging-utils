@@ -1,15 +1,24 @@
 import os
 import argparse
+import sys
 
-def check_differences(beamline, year, visit):
+def check_differences(beamline, year, visit, folder = None):
     print("Starting main function")
     # fist check to see which visit is active
 
     mib_files = []
     raw_dirs = []
-
-    raw_location = os.path.join('/dls',beamline,'data', year, visit, 'Merlin')
-    proc_location = os.path.join('/dls',beamline,'data', year, visit, 'processing', 'Merlin')
+    if folder:
+        # check that the path folder exists
+        raw_location = os.path.join('/dls',beamline,'data', year, visit, 'Merlin', os.path.relpath(folder))
+        if not os.path.exists(raw_location):
+            print('This folder ', raw_location,'does not exist!') 
+            print('The expected format for folder is sample1/dataset1/')
+            sys.exit()  # options here?
+    else:    
+        raw_location = os.path.join('/dls', beamline,'data', year, visit, 'Merlin')
+    
+    proc_location = os.path.join('/dls', beamline,'data', year, visit, 'processing', 'Merlin')
     if not os.path.exists(proc_location):
         os.mkdir(proc_location)
 
@@ -21,6 +30,8 @@ def check_differences(beamline, year, visit):
         # look at the files and see if there are any mib files there
         for f in files:
             if f.endswith('mib'):
+                if folder:
+                    p = './'+ folder + p[1:]
                 mib_files.append((p, f))
                 raw_dirs.append(p)
 
@@ -43,7 +54,7 @@ def check_differences(beamline, year, visit):
     return to_convert, mib_files
 
 
-def main(beamline, year, visit):
+def main(beamline, year, visit, folder = None):
     check_differences(beamline, year, visit)
 
 
@@ -52,10 +63,11 @@ if __name__ == "__main__":
     parser.add_argument('beamline', help='Beamline name')
     parser.add_argument('year', help='Year')
     parser.add_argument('visit', help='Session visit code')
+    parser.add_argument('folder', nargs= '?', help='Option to add folder')
     v_help = "Display all debug log messages"
     parser.add_argument("-v", "--verbose", help=v_help, action="store_true",
                         default=False)
 
     args = parser.parse_args()
     
-    main(args.beamline, args.year, args.visit)
+    main(args.beamline, args.year, args.visit, args.folder)

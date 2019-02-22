@@ -1,7 +1,7 @@
 import argparse
-from IdentifyPotentialConversions_test import check_differences
+from IdentifyPotentialConversions import check_differences
 
-def convert(beamline, year, visit, mib_files):
+def convert(beamline, year, visit, mib_files, folder = None):
     """    
     This is to convert a set of time-stamped 4DSTEM folders (mib_files) into a
     similar folder structure in the processing folder of the same visit. The
@@ -19,8 +19,12 @@ def convert(beamline, year, visit, mib_files):
     import os
     import time
     import numpy as np
-
-    raw_location = os.path.join('/dls',beamline,'data', year, visit, 'Merlin')
+    
+    if folder:
+        raw_location = os.path.join('/dls',beamline,'data', year, visit, 'Merlin', os.path.relpath(folder))
+    else:
+        raw_location = os.path.join('/dls',beamline,'data', year, visit, 'Merlin')  
+        
     proc_location = os.path.join('/dls',beamline,'data', year, visit, 'processing', 'Merlin')
     if not os.path.exists(proc_location):
         os.mkdir(proc_location)
@@ -30,7 +34,10 @@ def convert(beamline, year, visit, mib_files):
     # get together the full paths of the datasets
     mib_files_locations = []
     for i, file in enumerate(mib_files):
-        mib_files_locations.append(os.path.join(raw_location, os.path.relpath(mib_files[i][0]))) 
+        if folder:
+            mib_files_locations.append(os.path.join(raw_location, os.path.relpath(mib_files[i][0].split('/')[-1]))) 
+        else:  
+            mib_files_locations.append(os.path.join(raw_location, os.path.relpath(mib_files[i][0]))) 
     
     # main loop 
     for j, dirName in enumerate(mib_files_locations):
@@ -109,10 +116,11 @@ def convert(beamline, year, visit, mib_files):
             print('============================================================')
             continue
 
-def main(beamline, year, visit):
-    [to_convert, mib_files] = check_differences(beamline, year, visit)
+def main(beamline, year, visit, folder = None):
+    
+    [to_convert, mib_files] = check_differences(beamline, year, visit, folder)
     if bool(to_convert):
-        convert(beamline, year, visit, mib_files)
+        convert(beamline, year, visit, mib_files, folder)
     else:
         print('Nothing to convert here!')
 
@@ -121,9 +129,11 @@ if __name__ == "__main__":
     parser.add_argument('beamline', help='Beamline name')
     parser.add_argument('year', help='Year')
     parser.add_argument('visit', help='Session visit code')
+    parser.add_argument('folder', nargs= '?',help='OPTION to add a specific folder within a visit \
+                        Merlin folder to look for data, e.g. sample1/dataset1/')
     v_help = "Display all debug log messages"
     parser.add_argument("-v", "--verbose", help=v_help, action="store_true",
                         default=False)
 
     args = parser.parse_args()
-    main(args.beamline, args.year, args.visit)
+    main(args.beamline, args.year, args.visit, args.folder)
